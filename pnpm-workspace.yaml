@@ -1,0 +1,9 @@
+packages:
+  - .
+engineStrict: true
+saveExact: true
+allowBuilds:
+  sharp: true
+  unrs-resolver: true
+  esbuild: true
+  msw: false
