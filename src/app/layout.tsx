@@ -12,7 +12,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang={siteConfig.language}>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
-        <a className="skip-link" href="#main-content">
+        <a
+          className="fixed top-4 left-4 z-50 -translate-y-[200%] bg-primary px-4 py-3 text-primary-foreground focus:translate-y-0"
+          href="#main-content"
+        >
           Skip to content
         </a>
         {children}

@@ -28,7 +28,7 @@ const serverSchema = z
   .object({
     APP_ENV: z.enum(["development", "test", "preview", "production"]),
     SITE_URL: originSchema,
-    SITE_NAME: z.string().trim().min(1).default("Next.js Starter"),
+    SITE_NAME: z.string().trim().min(1).default("Adapt - Innovate - Forward"),
     SITE_DESCRIPTION: z
       .string()
       .trim()

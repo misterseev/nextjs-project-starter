@@ -2,13 +2,13 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #17221e;
-  --primary: #173c32;
+  --foreground: #161616;
+  --primary: #161616;
   --primary-foreground: #ffffff;
-  --muted: #f2f5f3;
-  --muted-foreground: #4b5e55;
-  --border: #d1dcd5;
-  --ring: #237454;
+  --muted: #f5f5f5;
+  --muted-foreground: #636363;
+  --border: #dedede;
+  --ring: #737373;
   --radius: 0.625rem;
 }
 @theme inline {
@@ -23,8 +23,18 @@
   --radius-lg: var(--radius);
   --font-sans: ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, monospace;
+  --font-display: Arial, Helvetica, sans-serif;
+  --font-label: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 2rem;
+  }
+  ::selection {
+    background: #161616;
+    color: #fff;
+  }
   * {
     border-color: var(--border);
   }
@@ -38,19 +48,6 @@
   }
   button:not(:disabled) {
     cursor: pointer;
-  }
-  .skip-link {
-    position: fixed;
-    top: 1rem;
-    left: 1rem;
-    z-index: 50;
-    padding: 0.75rem 1rem;
-    background: var(--primary);
-    color: var(--primary-foreground);
-    transform: translateY(-200%);
-  }
-  .skip-link:focus {
-    transform: translateY(0);
   }
   @media (prefers-reduced-motion: reduce) {
     *,

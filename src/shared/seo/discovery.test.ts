@@ -32,11 +32,11 @@ it("publishes canonical production URLs and page-specific social metadata", asyn
   expect(rootMetadata.alternates).toBeUndefined();
   expect(
     createMetadata({
-      title: "Next.js Starter",
+      title: "Adapt - Innovate - Forward",
       description: "A starter",
       path: "/",
     }).title,
-  ).toEqual({ absolute: "Next.js Starter" });
+  ).toEqual({ absolute: "Adapt - Innovate - Forward" });
   const metadata = createMetadata({
     title: "About",
     description: "About our team.",

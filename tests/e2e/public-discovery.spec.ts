@@ -12,9 +12,9 @@ test("public content and metadata work without JavaScript", async ({
   const response = await page.goto("http://127.0.0.1:3100/");
   expect(response?.status()).toBe(200);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Next.js Starter",
+    "Good ideas.Great starts.",
   );
-  await expect(page).toHaveTitle("Next.js Starter");
+  await expect(page).toHaveTitle("Adapt - Innovate - Forward");
   await expect(page.locator('meta[name="description"]')).toHaveAttribute(
     "content",
     /reusable foundation/,
@@ -29,14 +29,14 @@ test("public content and metadata work without JavaScript", async ({
   );
   await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
     "content",
-    "Next.js Starter",
+    "Adapt - Innovate - Forward",
   );
   const data: unknown = JSON.parse(
     await page.locator('script[type="application/ld+json"]').innerText(),
   );
   expect(data).toMatchObject({
     "@type": "WebSite",
-    name: "Next.js Starter",
+    name: "Adapt - Innovate - Forward",
     url: "https://www.acme.org",
   });
   await context.close();
@@ -99,7 +99,7 @@ test("headers, health, social image, and missing pages behave correctly", async 
   expect(image.headers()["content-type"]).toContain("image/png");
   const manifest = await request.get("/manifest.webmanifest");
   expect(await manifest.json()).toMatchObject({
-    name: "Next.js Starter",
+    name: "Adapt - Innovate - Forward",
     start_url: "/",
   });
 });

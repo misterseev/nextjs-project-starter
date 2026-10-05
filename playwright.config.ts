@@ -21,7 +21,7 @@ export default defineConfig({
     env: {
       APP_ENV: production ? "production" : "preview",
       SITE_URL: "https://www.acme.org",
-      SITE_NAME: "Next.js Starter",
+      SITE_NAME: "Adapt - Innovate - Forward",
       SITE_DESCRIPTION:
         "A reusable foundation for accessible, discoverable web applications.",
       INDEXING_ENABLED: production ? "true" : "false",
