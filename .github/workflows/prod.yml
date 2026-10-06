@@ -1,0 +1,119 @@
+name: Dev CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_push_branch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # Step 1: Check out the source code for aif-event-core-service
+      - name: Check out the source code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Retrieve and Increment Git Tag for develop branch
+      - name: Retrieve and Increment Dev Tag
+        id: version
+        run: |
+          git fetch --tags
+
+          # Filter for dev tags only
+          latest_tag=$(git tag --list '*-dev' | sort -V | tail -n 1)
+          if [ -z "$latest_tag" ]; then
+            latest_tag="1.0.0-dev"
+          fi
+
+          echo "Latest tag: $latest_tag"
+
+          # Strip "-dev" and split into major.minor.patch
+          clean_tag=${latest_tag%-dev}
+          IFS='.' read -r major minor patch <<<"${clean_tag}"
+
+          # Increment patch version
+          patch=$((patch + 1))
+
+          # Reconstruct new dev tag
+          new_tag="$major.$minor.$patch-dev"
+          echo "New tag: $new_tag"
+
+          echo "TAG=$new_tag" >> $GITHUB_ENV
+
+      # Step 3: Build and Push Docker Image
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          load: true
+          tags: softwareaif/starter-site-app:${{ env.TAG }}
+          cache-from: type=registry,ref=softwareaif/starter-site-app:buildcache
+          cache-to: type=registry,ref=softwareaif/starter-site-app:buildcache,mode=max
+
+      - name: Report Docker image size
+        run: sh scripts/report-docker-image-size.sh "softwareaif/starter-site-app:${{ env.TAG }}"
+
+      - name: Log out from Docker Hub
+        run: docker logout
+
+      - name: Create and Push Dev Tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git tag ${{ env.TAG }}
+          git push origin ${{ env.TAG }}
+
+      # Step 6: Check out Deployment Repository
+      - name: Check out deployment repository
+        uses: actions/checkout@v3
+        with:
+          repository: aifgrouplaos/AIF-Kubernetes
+          token: ${{ secrets.PTO_ACCESS_TOKEN }}
+          ref: main
+          path: k8s-repo
+
+      # Step 7: Reset Git Config for Deployment Repo
+      - name: Configure Git for Deployment Repo
+        run: |
+          cd k8s-repo
+          git config --unset credential.helper || true
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      # Step 8: Create a New Branch in the Deployment Repository
+      - name: Create a new branch in the deployment repo
+        run: |
+          cd k8s-repo
+          git checkout -b laopost-web-dev-${{ env.TAG }}
+
+      # Step 9: Update the Image Tag in the Deployment File
+      - name: Update image tag in deployment file
+        run: |
+          cd k8s-repo
+          sed -i 's|image: softwareaif/starter-site-app:.*|image: softwareaif/starter-site-app:${{ env.TAG }}|' lao-post/web/dev/deployment.yml
+
+      # Step 10: Commit Changes in the Deployment Repo
+      - name: Commit changes in deployment repo
+        run: |
+          cd k8s-repo
+          git add lao-post/web/dev/deployment.yml
+          git commit -m "Update laopost web dev to version ${{ env.TAG }}"
+
+      # Step 11: Push the New Branch to the Deployment Repository
+      - name: Push branch in deployment repo
+        run: |
+          cd k8s-repo
+          git push origin laopost-web-dev-${{ env.TAG }}
+
